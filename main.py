@@ -63,20 +63,19 @@ st.write(f"Does the text contain the word 'Python'? {contains_python}")
 average_word_length = char_count / word_count if word_count > 0 else 0
 st.write(f"Average Word Length: {average_word_length:.2f}")
 
-# 7. Grammar and Spelling Correction using Groq API
+# 7. Grammar and Spelling Correction using DeepSeek API
 st.header("✨ AI-Powered Grammar and Spelling Check")
 if st.button("Check Grammar and Spelling"):
     with st.spinner("Analyzing your text..."):
         try:
-            # Use Groq API to check grammar and spelling
             response = client.chat.completions.create(
                 messages=[
                     {
                         "role": "user",
-                        "content": f"Check the grammar and spelling of the following text and provide a corrected version if necessary:\n\n{user_input}",
+                        "content": f"Fix the grammar and spelling errors in this text and provide the corrected version only:\n\n{user_input}",
                     }
                 ],
-                model="mixtral-8x7b-32768",  # Use a valid model name
+                model="llama-3.3-70b-versatile",
             )
             corrected_text = response.choices[0].message.content.strip()
             st.subheader("Corrected Paragraph")
@@ -84,34 +83,19 @@ if st.button("Check Grammar and Spelling"):
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
-# 8. Grammar and Spelling Check with Roman Urdu Translation
-st.header("🌐 Grammar Check and Roman Urdu Translation")
-if st.button("Check Grammar and Translate to Roman Urdu"):
-    with st.spinner("Analyzing and translating your text..."):
+# 8. Roman Urdu Translation (Using DeepSeek Model)
+st.header("🌐 Translate to Roman Urdu")
+if st.button("Translate to Roman Urdu"):
+    with st.spinner("Translating your text..."):
         try:
-            # Use Groq API to check grammar and spelling
-            response = client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"Check the grammar and spelling of the following text and provide a corrected version if necessary:\n\n{user_input}",
-                    }
-                ],
-                model="mixtral-8x7b-32768",  # Use a valid model name
-            )
-            corrected_text = response.choices[0].message.content.strip()
-            st.subheader("Corrected Paragraph")
-            st.write(corrected_text)
-
-            # Use Groq API to translate the corrected text into Roman Urdu
             response_translation = client.chat.completions.create(
                 messages=[
                     {
                         "role": "user",
-                        "content": f"Translate the following text into Roman Urdu:\n\n{corrected_text}",
+                        "content": f"Translate this text into Roman Urdu only. Do not include explanations or any extra content:\n\n{user_input}",
                     }
                 ],
-                model="mixtral-8x7b-32768",  # Use a valid model name
+                model="llama-3.3-70b-versatile",
             )
             roman_urdu_text = response_translation.choices[0].message.content.strip()
             st.subheader("Roman Urdu Translation")
