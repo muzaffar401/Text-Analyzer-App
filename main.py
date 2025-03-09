@@ -1,8 +1,14 @@
 import streamlit as st
 import groq
 from collections import Counter
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import wordnet
+
+# Download necessary NLTK data files
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 
 # Set up Groq API client
 groq_api_key = "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"  # Replace with your Groq API key
