@@ -1,5 +1,8 @@
 import streamlit as st
 import groq
+from collections import Counter
+from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet
 
 # Set up Groq API client
 groq_api_key = "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"  # Replace with your Groq API key
@@ -34,36 +37,52 @@ vowel_count = sum(1 for char in user_input if char in vowels)
 st.subheader("Vowel Count")
 st.write(f"Total Vowels: {vowel_count}")
 
-# 3. Search and Replace
-st.subheader("🔍 Search and Replace")
-search_word = st.text_input("Enter a word to search for:")
-replace_word = st.text_input("Enter a word to replace it with:")
-if search_word and replace_word:
-    modified_text = user_input.replace(search_word, replace_word)
-    st.write("Modified Paragraph:")
-    st.write(modified_text)
+# 3. Longest and Shortest Word
+words = user_input.split()
+if words:
+    longest_word = max(words, key=len)
+    shortest_word = min(words, key=len)
+    st.subheader("Longest and Shortest Word")
+    st.write(f"Longest Word: {longest_word}")
+    st.write(f"Shortest Word: {shortest_word}")
 
-# 4. Uppercase and Lowercase Conversion
+# 4. Reverse Text
+st.subheader("🔄 Reverse Text")
+st.write(user_input[::-1])
+
+# 5. Most Frequent Word
+word_counts = Counter(words)
+most_common_word, most_common_count = word_counts.most_common(1)[0]
+st.subheader("Most Frequent Word")
+st.write(f"'{most_common_word}' appears {most_common_count} times.")
+
+# 6. Palindrome Detection
+palindromes = [word for word in words if word.lower() == word.lower()[::-1] and len(word) > 1]
+st.subheader("Palindrome Words")
+st.write(palindromes if palindromes else "No palindromes found.")
+
+# 7. Uppercase and Lowercase Conversion
 st.subheader("🔄 Uppercase and Lowercase Conversion")
 st.write("Uppercase Paragraph:")
 st.write(user_input.upper())
 st.write("Lowercase Paragraph:")
 st.write(user_input.lower())
 
-# 5. Type Casting
-st.subheader("Type Casting")
-st.write(f"Word Count (as string): {str(word_count)}")
-st.write(f"Vowel Count (as string): {str(vowel_count)}")
+# 8. Synonyms & Antonyms Finder
+st.subheader("Synonyms & Antonyms")
+word_for_synonyms = st.text_input("Enter a word to find synonyms and antonyms:")
+if word_for_synonyms:
+    synonyms = set()
+    antonyms = set()
+    for syn in wordnet.synsets(word_for_synonyms):
+        for lemma in syn.lemmas():
+            synonyms.add(lemma.name())
+            if lemma.antonyms():
+                antonyms.add(lemma.antonyms()[0].name())
+    st.write(f"Synonyms: {', '.join(synonyms) if synonyms else 'None found'}")
+    st.write(f"Antonyms: {', '.join(antonyms) if antonyms else 'None found'}")
 
-# 6. Operators
-st.subheader("Operators")
-contains_python = "Python" in user_input
-st.write(f"Does the text contain the word 'Python'? {contains_python}")
-
-average_word_length = char_count / word_count if word_count > 0 else 0
-st.write(f"Average Word Length: {average_word_length:.2f}")
-
-# 7. Grammar and Spelling Correction using DeepSeek API
+# 9. Grammar and Spelling Correction using Groq API
 st.header("✨ AI-Powered Grammar and Spelling Check")
 if st.button("Check Grammar and Spelling"):
     with st.spinner("Analyzing your text..."):
@@ -80,26 +99,6 @@ if st.button("Check Grammar and Spelling"):
             corrected_text = response.choices[0].message.content.strip()
             st.subheader("Corrected Paragraph")
             st.write(corrected_text)
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-
-# 8. Roman Urdu Translation (Using DeepSeek Model)
-st.header("🌐 Translate to Roman Urdu")
-if st.button("Translate to Roman Urdu"):
-    with st.spinner("Translating your text..."):
-        try:
-            response_translation = client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"Translate this text into Roman Urdu only. Do not include explanations or any extra content:\n\n{user_input}",
-                    }
-                ],
-                model="llama-3.3-70b-versatile",
-            )
-            roman_urdu_text = response_translation.choices[0].message.content.strip()
-            st.subheader("Roman Urdu Translation")
-            st.write(roman_urdu_text)
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
